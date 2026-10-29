@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — SocialSense AI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>📊 Overview Dashboard</h2>
+  <div class="subtitle">Key metrics and engagement insights across all platforms.</div>
+</div>
+{% if using_sample %}
+<span class="sample-badge">⚠️ Illustrative Sample Data — not real social media data</span>
+{% endif %}
+
+<!-- KPI Cards -->
+<div class="kpi-row">
+  <div class="kpi-card">
+    <div class="label">📬 Total Posts</div>
+    <div class="value">{{ "{:,}".format(total_posts) }}</div>
+  </div>
+  <div class="kpi-card">
+    <div class="label">❤️ Total Engagement</div>
+    <div class="value">{{ "{:,}".format(total_eng) }}</div>
+  </div>
+  <div class="kpi-card">
+    <div class="label">📈 Avg Engagement / Post</div>
+    <div class="value">{{ avg_eng }}</div>
+  </div>
+  <div class="kpi-card">
+    <div class="label">😊 Positive Sentiment</div>
+    <div class="value">{{ pos_pct }}%</div>
+  </div>
+</div>
+
+<!-- Sentiment + Platform -->
+<div class="chart-grid-2">
+  <div class="card">
+    <h3>Sentiment Distribution</h3>
+    <div id="chart-sentiment"></div>
+  </div>
+  <div class="card">
+    <h3>Posts by Platform</h3>
+    <div id="chart-platform"></div>
+  </div>
+</div>
+
+<!-- Engagement over time -->
+<div class="chart-grid-1 card">
+  <h3>Engagement Over Time</h3>
+  <div id="chart-engagement"></div>
+</div>
+
+<!-- Hashtags + Topics -->
+<div class="chart-grid-2">
+  <div class="card">
+    <h3>🔖 Top Hashtags</h3>
+    <div id="chart-hashtags"></div>
+  </div>
+  <div class="card">
+    <h3>🏆 Topics by Avg Engagement</h3>
+    <div id="chart-topics"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+renderChart('chart-sentiment',  {{ sentiment_chart  | safe }});
+renderChart('chart-platform',   {{ platform_chart   | safe }});
+renderChart('chart-engagement', {{ engagement_chart | safe }});
+renderChart('chart-hashtags',   {{ hashtag_chart    | safe }});
+renderChart('chart-topics',     {{ topic_chart      | safe }});
+</script>
+{% endblock %}
