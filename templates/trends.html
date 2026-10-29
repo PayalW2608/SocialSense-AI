@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Trend Discovery — SocialSense AI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>🔥 Trend Discovery Agent</h2>
+  <div class="subtitle">Discover emerging hashtags, keywords, and content patterns in your data.</div>
+</div>
+{% if using_sample %}
+<span class="sample-badge">⚠️ Illustrative Sample Data</span>
+{% endif %}
+
+<div class="chart-grid-2">
+  <div class="card"><h3>🔖 Top Hashtags</h3><div id="chart-ht"></div></div>
+  <div class="card"><h3>💬 Top Keywords</h3><div id="chart-kw"></div></div>
+</div>
+
+<div class="chart-grid-1 card">
+  <h3>📌 Topics by Average Engagement</h3>
+  <div id="chart-topic"></div>
+</div>
+
+<div class="chart-grid-1 card">
+  <h3>📅 Post Volume Over Time by Platform</h3>
+  <div id="chart-vol"></div>
+</div>
+
+<hr class="section" />
+
+<div class="card">
+  <h3>🤖 IBM Granite Trend Analysis</h3>
+  <div class="ai-output">{{ ai_summary }}</div>
+  <div style="margin-top:12px;">
+    <a href="data:text/markdown;charset=utf-8,{{ ai_summary | urlencode }}"
+       download="trend_report.md" class="btn btn-secondary btn-sm">⬇️ Export Trend Report</a>
+  </div>
+</div>
+
+{% if log %}
+<div class="log-section">
+  <details>
+    <summary>🤖 Agent Activity Log</summary>
+    <table class="log-table">
+      <tr><th>Agent</th><th>Status</th><th>Message</th><th>ms</th></tr>
+      {% for e in log %}
+      <tr>
+        <td>{{ e.agent }}</td>
+        <td class="status-{{ e.status }}">{{ e.status }}</td>
+        <td>{{ e.message }}</td>
+        <td>{{ e.ms }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </details>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+renderChart('chart-ht',    {{ ht_chart    | safe }});
+renderChart('chart-kw',    {{ kw_chart    | safe }});
+renderChart('chart-topic', {{ topic_chart | safe }});
+renderChart('chart-vol',   {{ vol_chart   | safe }});
+</script>
+{% endblock %}
