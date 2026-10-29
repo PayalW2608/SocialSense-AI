@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Data Import — SocialSense AI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>📥 Data Import &amp; Multimodal Input</h2>
+  <div class="subtitle">Upload your social media data or use the built-in sample.</div>
+</div>
+
+{% if message %}
+<div class="alert alert-success">✅ {{ message }}</div>
+{% endif %}
+{% if error %}
+<div class="alert alert-error">❌ {{ error }}</div>
+{% endif %}
+
+<div class="alert alert-info">
+  ℹ️ <strong>Live API Notice:</strong> This tool does not connect to live social media APIs by default.
+  To pull live data, configure your platform API credentials and extend the <code>data/</code> module.
+</div>
+
+<!-- Sample CSV Download -->
+<div class="form-card">
+  <h3 style="font-size:0.95rem;font-weight:700;margin-bottom:12px;">📄 Sample CSV Template</h3>
+  <p style="font-size:0.82rem;color:#64748b;margin-bottom:12px;">
+    Download this template, fill it with your real data, then upload it below.
+  </p>
+  <a href="/download-sample-csv" class="btn btn-secondary btn-sm">⬇️ Download Sample CSV</a>
+</div>
+
+<!-- Use Sample Data -->
+<div class="form-card">
+  <h3 style="font-size:0.95rem;font-weight:700;margin-bottom:10px;">🟡 Use Illustrative Sample Data</h3>
+  <p style="font-size:0.82rem;color:#64748b;margin-bottom:12px;">120 fictional posts for demonstration purposes.</p>
+  <form method="POST">
+    <input type="hidden" name="action" value="use_sample" />
+    <button type="submit" class="btn btn-secondary">Load Sample Data</button>
+  </form>
+</div>
+
+<!-- Upload CSV -->
+<div class="form-card">
+  <h3 style="font-size:0.95rem;font-weight:700;margin-bottom:10px;">🟢 Upload Your CSV</h3>
+  <p style="font-size:0.82rem;color:#64748b;margin-bottom:4px;">
+    Required columns: <code>date, platform, post_text, sentiment, likes, comments, shares</code>
+  </p>
+  <p style="font-size:0.82rem;color:#64748b;margin-bottom:14px;">
+    Optional: <code>hashtags, topic, engagement</code>
+  </p>
+  <form method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="action" value="upload_csv" />
+    <div class="form-group">
+      <label>Select CSV File</label>
+      <input type="file" name="csv_file" accept=".csv" />
+    </div>
+    <button type="submit" class="btn btn-primary">⬆️ Upload &amp; Load</button>
+  </form>
+</div>
+
+<!-- Image upload (display only) -->
+<div class="form-card">
+  <h3 style="font-size:0.95rem;font-weight:700;margin-bottom:10px;">🖼️ Image Upload (Multimodal)</h3>
+  <p style="font-size:0.82rem;color:#64748b;margin-bottom:12px;">
+    Upload a social media screenshot or visual asset. Visual analysis requires a multimodal
+    IBM Granite model configured in <code>config.py</code>.
+  </p>
+  <input type="file" accept="image/png,image/jpeg,image/webp" style="font-size:0.82rem;" />
+  <div class="alert alert-warning" style="margin-top:12px;">
+    ℹ️ Image data cannot be sent directly to a text-only model.
+    Configure a multimodal endpoint to enable visual analysis.
+  </div>
+</div>
+
+<!-- Audio upload (display only) -->
+<div class="form-card">
+  <h3 style="font-size:0.95rem;font-weight:700;margin-bottom:10px;">🎵 Audio Upload (Speech-to-Text)</h3>
+  <p style="font-size:0.82rem;color:#64748b;margin-bottom:12px;">
+    Upload an audio file for transcription. Requires IBM Watson Speech to Text credentials in <code>config.py</code>.
+  </p>
+  <input type="file" accept="audio/mpeg,audio/wav,audio/m4a,audio/ogg" style="font-size:0.82rem;" />
+  <div class="alert alert-warning" style="margin-top:12px;">
+    ℹ️ Configure IBM Watson Speech to Text to enable audio transcription.
+  </div>
+</div>
+{% endblock %}
