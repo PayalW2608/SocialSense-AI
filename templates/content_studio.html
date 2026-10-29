@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}AI Content Studio — SocialSense AI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>✍️ AI Content Studio</h2>
+  <div class="subtitle">Generate platform-ready captions, hashtags, CTAs, and campaign ideas powered by IBM Granite.</div>
+</div>
+
+{% if error %}
+<div class="alert alert-error">❌ {{ error }}</div>
+{% endif %}
+
+<div class="form-card">
+  <form method="POST">
+    <input type="hidden" name="action" value="generate" />
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label>🏷️ Brand Name</label>
+        <input type="text" name="brand" placeholder="e.g. EcoVibe" value="{{ form_data.get('brand','') }}" />
+      </div>
+      <div class="form-group">
+        <label>🏭 Industry</label>
+        <input type="text" name="industry" placeholder="e.g. Sustainable Fashion" value="{{ form_data.get('industry','') }}" />
+      </div>
+      <div class="form-group">
+        <label>👥 Target Audience</label>
+        <input type="text" name="target_audience" placeholder="e.g. Millennials aged 22–35" value="{{ form_data.get('target_audience','') }}" />
+      </div>
+      <div class="form-group">
+        <label>📱 Platform</label>
+        <select name="platform">
+          {% for p in platforms %}
+          <option value="{{ p }}" {% if form_data.get('platform') == p %}selected{% endif %}>{{ p }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>🎨 Tone</label>
+        <select name="tone">
+          {% for t in tones %}
+          <option value="{{ t }}" {% if form_data.get('tone') == t %}selected{% endif %}>{{ t }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>🎯 Campaign Objective</label>
+        <select name="objective">
+          {% for o in objectives %}
+          <option value="{{ o }}" {% if form_data.get('objective') == o %}selected{% endif %}>{{ o }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>💡 Topic / Theme</label>
+      <input type="text" name="topic" placeholder="e.g. Summer sustainability collection launch" value="{{ form_data.get('topic','') }}" />
+    </div>
+    <div class="form-group">
+      <label>📎 Additional Context (optional)</label>
+      <textarea name="extra_context" placeholder="Key messages, USPs, campaign details…">{{ form_data.get('extra_context','') }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">🚀 Generate Content with IBM Granite</button>
+  </form>
+</div>
+
+{% if result_content %}
+<div class="card" style="margin-bottom:20px;">
+  <h3>📋 Generated Content</h3>
+  <div class="ai-output">{{ result_content }}</div>
+  <div style="margin-top:14px;">
+    <a href="data:text/markdown;charset=utf-8,{{ result_content | urlencode }}"
+       download="socialsense_content.md" class="btn btn-secondary btn-sm">⬇️ Export as Markdown</a>
+  </div>
+</div>
+
+{% if last_meta %}
+<div class="form-card">
+  <h3 style="font-size:0.9rem;font-weight:700;margin-bottom:10px;">🔄 Regenerate a Single Caption</h3>
+  <form method="POST">
+    <input type="hidden" name="action" value="regenerate" />
+    <div class="form-group">
+      <label>Optional feedback</label>
+      <input type="text" name="feedback" placeholder="e.g. Make it shorter, more humorous…" />
+    </div>
+    <button type="submit" class="btn btn-secondary btn-sm">Regenerate Caption</button>
+  </form>
+</div>
+{% endif %}
+
+<!-- Agent log -->
+{% if log %}
+<div class="log-section">
+  <details>
+    <summary>🤖 Agent Activity Log ({{ log|length }} events)</summary>
+    <table class="log-table">
+      <tr><th>Agent</th><th>Status</th><th>Message</th><th>ms</th></tr>
+      {% for e in log %}
+      <tr>
+        <td>{{ e.agent }}</td>
+        <td class="status-{{ e.status }}">
+          {% if e.status == 'success' %}✅{% elif e.status == 'error' %}❌{% else %}⏳{% endif %}
+          {{ e.status }}
+        </td>
+        <td>{{ e.message }}</td>
+        <td>{{ e.ms }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </details>
+</div>
+{% endif %}
+{% endif %}
+{% endblock %}
