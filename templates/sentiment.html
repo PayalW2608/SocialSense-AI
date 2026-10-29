@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Sentiment Analysis — SocialSense AI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>💬 Sentiment Analysis Agent</h2>
+  <div class="subtitle">Classify and understand audience sentiment across posts and platforms.</div>
+</div>
+{% if using_sample %}
+<span class="sample-badge">⚠️ Illustrative Sample Data</span>
+{% endif %}
+
+<!-- KPI row -->
+{% if dist and dist.total %}
+<div class="kpi-row">
+  <div class="kpi-card"><div class="label">Total Posts</div><div class="value">{{ dist.total }}</div></div>
+  <div class="kpi-card" style="border-left:3px solid #22c55e;">
+    <div class="label">😊 Positive</div>
+    <div class="value" style="color:#16a34a;">{{ dist.positive }} <span style="font-size:1rem;color:#64748b;">({{ "%.1f"|format(dist.positive / dist.total * 100) }}%)</span></div>
+  </div>
+  <div class="kpi-card" style="border-left:3px solid #ef4444;">
+    <div class="label">😞 Negative</div>
+    <div class="value" style="color:#dc2626;">{{ dist.negative }} <span style="font-size:1rem;color:#64748b;">({{ "%.1f"|format(dist.negative / dist.total * 100) }}%)</span></div>
+  </div>
+  <div class="kpi-card" style="border-left:3px solid #94a3b8;">
+    <div class="label">😐 Neutral</div>
+    <div class="value" style="color:#475569;">{{ dist.neutral }} <span style="font-size:1rem;color:#64748b;">({{ "%.1f"|format(dist.neutral / dist.total * 100) }}%)</span></div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Charts -->
+<div class="chart-grid-2">
+  <div class="card"><h3>Sentiment Breakdown</h3><div id="chart-sent"></div></div>
+  <div class="card"><h3>Sentiment Over Time</h3><div id="chart-time"></div></div>
+</div>
+<div class="chart-grid-1 card">
+  <h3>Sentiment by Platform</h3>
+  <div id="chart-plat"></div>
+</div>
+
+<hr class="section" />
+
+<!-- Free-text AI analysis -->
+<div class="form-card">
+  <h3 style="font-size:0.95rem;font-weight:700;margin-bottom:10px;">🔍 Free-Text AI Analysis</h3>
+  <p style="font-size:0.82rem;color:#64748b;margin-bottom:12px;">
+    Paste social media posts or comments and let IBM Granite analyse the sentiment.
+  </p>
+  {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+  <form method="POST">
+    <div class="form-group">
+      <label>Posts / Comments</label>
+      <textarea name="raw_text" rows="6" placeholder="Paste multiple posts separated by line breaks…">{{ raw_text }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">🔍 Analyse with IBM Granite</button>
+  </form>
+</div>
+
+{% if ai_summary %}
+<div class="card" style="margin-bottom:20px;">
+  <h3>🤖 IBM Granite Sentiment Analysis</h3>
+  <div class="ai-output">{{ ai_summary }}</div>
+  <div style="margin-top:12px;">
+    <a href="data:text/markdown;charset=utf-8,{{ ai_summary | urlencode }}"
+       download="sentiment_analysis.md" class="btn btn-secondary btn-sm">⬇️ Export Analysis</a>
+  </div>
+</div>
+{% endif %}
+
+{% if log %}
+<div class="log-section">
+  <details>
+    <summary>🤖 Agent Activity Log</summary>
+    <table class="log-table">
+      <tr><th>Agent</th><th>Status</th><th>Message</th><th>ms</th></tr>
+      {% for e in log %}
+      <tr>
+        <td>{{ e.agent }}</td>
+        <td class="status-{{ e.status }}">{{ e.status }}</td>
+        <td>{{ e.message }}</td>
+        <td>{{ e.ms }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </details>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+renderChart('chart-sent', {{ sent_chart | safe }});
+renderChart('chart-time', {{ time_chart | safe }});
+renderChart('chart-plat', {{ plat_chart | safe }});
+</script>
+{% endblock %}
