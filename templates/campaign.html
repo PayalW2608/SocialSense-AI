@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Campaign Strategy — SocialSense AI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>🎯 Campaign Strategy Agent</h2>
+  <div class="subtitle">Generate a full data-driven campaign strategy powered by IBM Granite.</div>
+</div>
+{% if using_sample %}
+<span class="sample-badge">⚠️ Illustrative Sample Data</span>
+{% endif %}
+{% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+
+<div class="form-card">
+  <form method="POST">
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label>🏷️ Brand Name</label>
+        <input type="text" name="brand" placeholder="e.g. EcoVibe"
+               value="{{ form_data.get('brand', [''])[0] if form_data else '' }}" />
+      </div>
+      <div class="form-group">
+        <label>🏭 Industry</label>
+        <input type="text" name="industry" placeholder="e.g. Sustainable Fashion"
+               value="{{ form_data.get('industry', [''])[0] if form_data else '' }}" />
+      </div>
+      <div class="form-group">
+        <label>👥 Target Audience</label>
+        <input type="text" name="target_audience" placeholder="e.g. Eco-conscious millennials 22–35"
+               value="{{ form_data.get('target_audience', [''])[0] if form_data else '' }}" />
+      </div>
+      <div class="form-group">
+        <label>🎯 Campaign Objective</label>
+        <select name="objective">
+          {% for o in objectives %}
+          <option value="{{ o }}">{{ o }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">🚀 Generate Strategy with IBM Granite</button>
+  </form>
+</div>
+
+{% if ai_strategy %}
+<!-- Analytics charts -->
+<div class="chart-grid-2">
+  {% if timing_chart %}
+  <div class="card">
+    <h3>⏰ Best Posting Hours</h3>
+    <div id="chart-timing"></div>
+    <p style="font-size:0.73rem;color:#64748b;margin-top:6px;">Based on historical engagement from imported posts.</p>
+  </div>
+  {% else %}
+  <div class="card">
+    <h3>⏰ Best Posting Hours</h3>
+    <div class="alert alert-info" style="margin-top:8px;">
+      At least 20 posts with date and engagement data are required to calculate posting times.
+    </div>
+  </div>
+  {% endif %}
+
+  {% if platform_chart %}
+  <div class="card">
+    <h3>📱 Platform Performance</h3>
+    <div id="chart-platform"></div>
+  </div>
+  {% else %}
+  <div class="card">
+    <h3>📱 Platform Performance</h3>
+    <div class="alert alert-info" style="margin-top:8px;">No platform engagement data available.</div>
+  </div>
+  {% endif %}
+</div>
+
+<hr class="section" />
+
+<div class="card">
+  <h3>🤖 IBM Granite Campaign Strategy</h3>
+  <div class="ai-output">{{ ai_strategy }}</div>
+  <div style="margin-top:12px;">
+    <a href="data:text/markdown;charset=utf-8,{{ ai_strategy | urlencode }}"
+       download="campaign_strategy.md" class="btn btn-secondary btn-sm">⬇️ Export Strategy</a>
+  </div>
+</div>
+{% endif %}
+
+{% if log %}
+<div class="log-section">
+  <details>
+    <summary>🤖 Agent Activity Log</summary>
+    <table class="log-table">
+      <tr><th>Agent</th><th>Status</th><th>Message</th><th>ms</th></tr>
+      {% for e in log %}
+      <tr>
+        <td>{{ e.agent }}</td>
+        <td class="status-{{ e.status }}">{{ e.status }}</td>
+        <td>{{ e.message }}</td>
+        <td>{{ e.ms }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </details>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if ai_strategy %}
+<script>
+renderChart('chart-timing',   {{ timing_chart   | safe }});
+renderChart('chart-platform', {{ platform_chart | safe }});
+</script>
+{% endif %}
+{% endblock %}
