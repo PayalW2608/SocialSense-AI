@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Competitor Intelligence — SocialSense AI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>🏆 Competitor Intelligence Agent</h2>
+  <div class="subtitle">Benchmark engagement, sentiment, and content strategy against competitors.</div>
+</div>
+
+{% if using_sample_comp %}
+<span class="sample-badge">⚠️ Illustrative Sample Competitor Data</span>
+{% endif %}
+{% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+
+<!-- Upload competitor CSV -->
+<div class="form-card">
+  <h3 style="font-size:0.9rem;font-weight:700;margin-bottom:8px;">Upload Competitor CSV (optional)</h3>
+  <p style="font-size:0.78rem;color:#64748b;margin-bottom:10px;">
+    Required columns: <code>brand, avg_likes, avg_comments, avg_shares, total_posts, positive_pct, negative_pct, top_hashtag</code>
+  </p>
+  <form method="POST" enctype="multipart/form-data" style="display:flex;gap:10px;align-items:flex-end;">
+    <input type="file" name="comp_csv" accept=".csv" style="font-size:0.82rem;" />
+    <button type="submit" class="btn btn-primary btn-sm">Analyse</button>
+  </form>
+</div>
+
+<!-- Charts -->
+<div class="chart-grid-2">
+  <div class="card"><h3>📊 Engagement Comparison</h3><div id="chart-eng"></div></div>
+  <div class="card"><h3>😊 Sentiment Comparison</h3><div id="chart-sent"></div></div>
+</div>
+<div class="chart-grid-1 card">
+  <h3>⚡ Composite Engagement Score</h3>
+  <div id="chart-score"></div>
+  <p style="font-size:0.73rem;color:#64748b;margin-top:8px;">
+    Score = avg_likes + (avg_comments × 2) + (avg_shares × 3).
+    Engagement rate (%) requires follower counts which are not included in this view.
+  </p>
+</div>
+
+<!-- Raw data table -->
+{% if comp_data %}
+<div class="card" style="margin-bottom:20px;">
+  <h3>📋 Competitor Data</h3>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <tr>{% for k in comp_data[0].keys() %}<th>{{ k }}</th>{% endfor %}</tr>
+      {% for row in comp_data %}
+      <tr>{% for v in row.values() %}<td>{{ v }}</td>{% endfor %}</tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+{% endif %}
+
+<hr class="section" />
+
+<div class="card">
+  <h3>🤖 IBM Granite Competitor Intelligence Report</h3>
+  <div class="ai-output">{{ ai_report }}</div>
+  <div style="margin-top:12px;">
+    <a href="data:text/markdown;charset=utf-8,{{ ai_report | urlencode }}"
+       download="competitor_report.md" class="btn btn-secondary btn-sm">⬇️ Export Report</a>
+  </div>
+</div>
+
+{% if log %}
+<div class="log-section">
+  <details>
+    <summary>🤖 Agent Activity Log</summary>
+    <table class="log-table">
+      <tr><th>Agent</th><th>Status</th><th>Message</th><th>ms</th></tr>
+      {% for e in log %}
+      <tr>
+        <td>{{ e.agent }}</td>
+        <td class="status-{{ e.status }}">{{ e.status }}</td>
+        <td>{{ e.message }}</td>
+        <td>{{ e.ms }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </details>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+renderChart('chart-eng',   {{ eng_chart   | safe }});
+renderChart('chart-sent',  {{ sent_chart  | safe }});
+renderChart('chart-score', {{ score_chart | safe }});
+</script>
+{% endblock %}
